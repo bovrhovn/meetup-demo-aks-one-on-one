@@ -1,0 +1,10 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: webapi
+  namespace: sul
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: sul-back

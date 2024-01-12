@@ -1,0 +1,18 @@
+﻿@page
+@using SimpleUrlList.Web.Base
+
+@model DashboardPageModel
+@inject IUserDataContext userDataContext
+
+@{
+    var currentUser = userDataContext.GetCurrentUser();
+    var identityName = currentUser.Fullname;
+    ViewData["Title"] = "Dashboard " + identityName;
+}
+@if (string.IsNullOrEmpty(Model.Message))
+{
+    <p class="text-warning">@Model.Message</p>
+}
+
+<h1>Dashboard for @identityName</h1>
+

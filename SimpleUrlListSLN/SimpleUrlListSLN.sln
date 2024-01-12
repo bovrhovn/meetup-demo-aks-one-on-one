@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleUrlList.Web", "SimpleUrlList.Web\SimpleUrlList.Web.csproj", "{02D0FC0E-3252-4098-ABE4-5A8DAC687E74}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{CF68BABE-F2F6-494B-877E-8526883640AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleUrlList.Api", "SimpleUrlList.Api\SimpleUrlList.Api.csproj", "{46A7A049-A5EA-4AF4-B1D2-299765A1E925}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleUrlList.Shared", "SimpleUrlList.Shared\SimpleUrlList.Shared.csproj", "{A86E0580-9CF7-491B-8E8F-A0520FA8915D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleUrlList.Interfaces", "SimpleUrlList.Interfaces\SimpleUrlList.Interfaces.csproj", "{392AB5C9-8CC0-412A-991E-295CB5E798E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleUrlList.Models", "SimpleUrlList.Models\SimpleUrlList.Models.csproj", "{FA2F2190-80B6-488B-9210-822106A46408}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02D0FC0E-3252-4098-ABE4-5A8DAC687E74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02D0FC0E-3252-4098-ABE4-5A8DAC687E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02D0FC0E-3252-4098-ABE4-5A8DAC687E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02D0FC0E-3252-4098-ABE4-5A8DAC687E74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46A7A049-A5EA-4AF4-B1D2-299765A1E925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46A7A049-A5EA-4AF4-B1D2-299765A1E925}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46A7A049-A5EA-4AF4-B1D2-299765A1E925}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46A7A049-A5EA-4AF4-B1D2-299765A1E925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A86E0580-9CF7-491B-8E8F-A0520FA8915D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A86E0580-9CF7-491B-8E8F-A0520FA8915D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A86E0580-9CF7-491B-8E8F-A0520FA8915D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A86E0580-9CF7-491B-8E8F-A0520FA8915D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{392AB5C9-8CC0-412A-991E-295CB5E798E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{392AB5C9-8CC0-412A-991E-295CB5E798E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{392AB5C9-8CC0-412A-991E-295CB5E798E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{392AB5C9-8CC0-412A-991E-295CB5E798E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA2F2190-80B6-488B-9210-822106A46408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA2F2190-80B6-488B-9210-822106A46408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA2F2190-80B6-488B-9210-822106A46408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA2F2190-80B6-488B-9210-822106A46408}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02D0FC0E-3252-4098-ABE4-5A8DAC687E74} = {CF68BABE-F2F6-494B-877E-8526883640AD}
+		{46A7A049-A5EA-4AF4-B1D2-299765A1E925} = {CF68BABE-F2F6-494B-877E-8526883640AD}
+		{A86E0580-9CF7-491B-8E8F-A0520FA8915D} = {CF68BABE-F2F6-494B-877E-8526883640AD}
+		{392AB5C9-8CC0-412A-991E-295CB5E798E6} = {CF68BABE-F2F6-494B-877E-8526883640AD}
+		{FA2F2190-80B6-488B-9210-822106A46408} = {CF68BABE-F2F6-494B-877E-8526883640AD}
+	EndGlobalSection
+EndGlobal

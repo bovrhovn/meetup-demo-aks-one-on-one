@@ -1,0 +1,21 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<h1 class="display-4">Welcome to Simple URL list demo page</h1>
+<p>
+    This web page enables you to create a list of URLs and it creates a short URL for collection.
+    With respect to the short URL, you can access the list of URLs.
+    <br>
+    <br>
+    By registering, you can:
+</p>
+<ul>
+    <li>Create, update and delete list of url</li>
+    <li>Generate short url for the url list</li>
+    <li>Check how many people clicked on the url</li>
+    <li>Download content of the urls as PDF document (to be added)</li>
+</ul>
+You can register <a asp-page="/User/Register">here</a> or login <a asp-page="/User/Login">here</a>.
