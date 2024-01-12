@@ -1,0 +1,33 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY ["SimpleUrlListSLN/SimpleUrlList.Models/", "SimpleUrlList.Models/"]
+COPY ["SimpleUrlListSLN/SimpleUrlList.Interfaces/", "SimpleUrlList.Interfaces/"]
+COPY ["SimpleUrlListSLN/SimpleUrlList.Shared/", "SimpleUrlList.Shared/"]
+COPY ["SimpleUrlListSLN/SimpleUrlList.Web/", "SimpleUrlList.Web/"]
+
+RUN dotnet restore "SimpleUrlList.Shared/SimpleUrlList.Shared.csproj"
+RUN dotnet restore "SimpleUrlList.Models/SimpleUrlList.Models.csproj"
+RUN dotnet restore "SimpleUrlList.Interfaces/SimpleUrlList.Interfaces.csproj"
+RUN dotnet restore "SimpleUrlList.Web/SimpleUrlList.Web.csproj"
+
+COPY . .
+
+WORKDIR "/src/"
+RUN dotnet restore "SimpleUrlList.Shared/SimpleUrlList.Shared.csproj"
+RUN dotnet restore "SimpleUrlList.Models/SimpleUrlList.Models.csproj"
+RUN dotnet restore "SimpleUrlList.Interfaces/SimpleUrlList.Interfaces.csproj"
+RUN dotnet restore "SimpleUrlList.Web/SimpleUrlList.Web.csproj"
+
+RUN dotnet build "SimpleUrlList.Shared/SimpleUrlList.Shared.csproj" -c Release -o /SimpleUrlList.Web
+RUN dotnet build "SimpleUrlList.Models/SimpleUrlList.Models.csproj" -c Release -o /SimpleUrlList.Web
+RUN dotnet build "SimpleUrlList.Interfaces/SimpleUrlList.Interfaces.csproj" -c Release -o /SimpleUrlList.Web
+RUN dotnet build "SimpleUrlList.Web/SimpleUrlList.Web.csproj" -c Release -o /app
+
+FROM build AS publish
+RUN dotnet publish "SimpleUrlList.Web/SimpleUrlList.Web.csproj" -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 as final
+WORKDIR /app
+COPY --from=publish /app .
+ENTRYPOINT ["dotnet", "SimpleUrlList.Web.dll"]
