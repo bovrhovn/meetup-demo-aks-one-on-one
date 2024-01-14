@@ -8,7 +8,7 @@ using SimpleUrlList.Web.Base;
 namespace SimpleUrlList.Web.Pages.User;
 
 [AllowAnonymous]
-public class RegisterPageModel(ILogger<RegisterPageModel> logger, IUserRepository userRepository)
+public class RegisterPageModel(ILogger<RegisterPageModel> logger, IUserService userService)
     : BasePageModel
 {
     public void OnGetAsync() => logger.LogInformation("Loaded register page at {DateLoaded}", DateTime.Now);
@@ -23,7 +23,7 @@ public class RegisterPageModel(ILogger<RegisterPageModel> logger, IUserRepositor
         }
 
         //check if email is already on
-        var user = await userRepository.FindAsync(NewUser.Email);
+        var user = await userService.FindAsync(NewUser.Email);
         if (user != null)
         {
             Message = $"User with email {user.Email} already exists in database, try new one";
@@ -31,7 +31,7 @@ public class RegisterPageModel(ILogger<RegisterPageModel> logger, IUserRepositor
             return Page();
         }
 
-        var ttaUser = await userRepository.InsertAsync(NewUser);
+        var ttaUser = await userService.InsertAsync(NewUser);
         
         await HttpContext.SignInAsync(ttaUser.GenerateClaims());
 

@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SimpleUrlList.Models\SimpleUrlList.Models.csproj" />
+      <ProjectReference Include="..\SimpleUrlList.Shared\SimpleUrlList.Shared.csproj" />
     </ItemGroup>
 
 </Project>

@@ -8,7 +8,7 @@ using SimpleUrlList.Web.Models;
 namespace SimpleUrlList.Web.Pages.User;
 
 [AllowAnonymous]
-public class LoginPageModel(ILogger<LoginPageModel> logger, IUserRepository userRepository)
+public class LoginPageModel(ILogger<LoginPageModel> logger, IUserService userService)
     : BasePageModel
 {
     public void OnGet() => logger.LogInformation("Load page at {DateLoaded}", DateTime.Now);
@@ -22,7 +22,7 @@ public class LoginPageModel(ILogger<LoginPageModel> logger, IUserRepository user
             return Page();
         }
 
-        var user = await userRepository.LoginAsync(LoginData.Email, LoginData.Password);
+        var user = await userService.LoginAsync(LoginData.Email, LoginData.Password);
 
         if (user == null)
         {

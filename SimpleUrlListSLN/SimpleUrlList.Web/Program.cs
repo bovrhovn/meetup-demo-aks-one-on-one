@@ -13,10 +13,14 @@ builder.Services.AddOptions<AuthOptions>()
 builder.Services.AddOptions<AppOptions>()
     .Bind(builder.Configuration.GetSection(SettingsNameHelper.AppOptionsSectionName))
     .ValidateDataAnnotations();
+builder.Services.AddOptions<DataOptions>()
+    .Bind(builder.Configuration.GetSection(SettingsNameHelper.DataOptionsSectionName))
+    .ValidateDataAnnotations();
 
 builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => options.LoginPath = new PathString("/User/Login"));
 builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
