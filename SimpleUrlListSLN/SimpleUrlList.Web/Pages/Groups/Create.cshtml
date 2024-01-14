@@ -1,0 +1,43 @@
+﻿@page
+@model SimpleUrlList.Web.Pages.Groups.CreatePageModel
+
+@{
+    ViewData["Title"] = "Create new link group";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/User/Dashboard">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-page="/Groups/Index">Link groups</a>
+        </li>
+        <li aria-current="page"
+            class="breadcrumb-item active">
+            Create
+        </li>
+    </ol>
+}
+
+<h3>Create link group</h3>
+<div class="mb-3">
+    <label asp-for="CreateLinkGroup.Name" class="form-label">Name</label>
+    <input asp-for="CreateLinkGroup.Name" class="form-control" required="required" id="tbName" type="text">
+</div>
+<div class="mb-3">
+    <label asp-for="CreateLinkGroup.ShortName" class="form-label">Shortname</label>
+    <input asp-for="CreateLinkGroup.ShortName" class="form-control" required="required" id="tbShortName" type="text">
+</div>
+<div class="mb-3">
+    <label asp-for="CreateLinkGroup.Description" class="form-label">Description</label>
+    <input asp-for="CreateLinkGroup.Description" class="form-control" id="tbDescription"
+           type="text">
+</div>
+<div class="mb-3">
+    <button class="btn btn-primary mr-3 mt-2">
+        Save <i class="fas fa-save"></i>
+    </button>
+    <a asp-page="/Groups/Index">Back to link groups</a>
+</div>

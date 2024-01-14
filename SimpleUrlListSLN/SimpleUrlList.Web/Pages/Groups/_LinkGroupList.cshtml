@@ -1,0 +1,140 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SimpleUrlList.Shared.PaginatedList<SimpleUrlList.Models.LinkGroup>
+@if (Model.Any())
+{
+    <div id="grid">
+        <table class="table table-hover"
+               id="tbData">
+            <caption>
+                @if (string.IsNullOrEmpty(Model.Query))
+                {
+                    @:Link groups
+                }
+                else
+                {
+                    @:Link groups based on <b>@Model.Query</b>
+                }
+            </caption>
+            <thead class="table-dark">
+            <tr>
+                <th>Category</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th class="text-center">
+                    Link count
+                </th>
+                <th>...</th>
+            </tr>
+            </thead>
+            @foreach (var linkGroup in Model)
+            {
+                <tr>
+                    <td>@linkGroup.Category.Name</td>
+                    <td>
+                        <a asp-page="/Groups/Details" asp-route-id="@linkGroup.LinkGroupId">
+                            @linkGroup.Name
+                        </a>
+                        <br/>
+                        <small>created<b>@linkGroup.CreatedAt.ToString("dd.MM.yyyy")</b> from user <b>@linkGroup.User.FullName</b></small>
+                    </td>
+                    <td>
+                        @linkGroup.Description
+                    </td>
+                    <td class="text-center">
+                        @linkGroup.Links.Count
+                    </td>
+                    <td>
+                        <a asp-page="/Groups/Edit"
+                           asp-route-id="@linkGroup.LinkGroupId">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        &nbsp;&nbsp;
+                        <a asp-page="/Groups/Delete"
+                           asp-route-id="@linkGroup.LinkGroupId">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </table>
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                    @if (Model.PageIndex - 1 < 1)
+                    {
+                        <a asp-route-pageNumber="1"
+                           asp-route-query="@Model.Query"
+                           class="page-link">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-route-pageNumber="@(Model.PageIndex - 1)"
+                           asp-route-query="@Model.Query"
+                           class="page-link">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+                    }
+                </li>
+                @for (var currentPageIndex = 1; currentPageIndex <= Model.TotalPages; currentPageIndex++)
+                {
+                    if (currentPageIndex < Model.PageSize)
+                    {
+                        <li class="page-item @(Model.PageIndex == currentPageIndex ? "active" : "")">
+                            <a asp-route-pageNumber="@currentPageIndex"
+                               asp-route-query="@Model.Query"
+                               class="page-link">
+                                @currentPageIndex
+                            </a>
+                        </li>
+                    }
+                }
+                <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                    @if (Model.PageIndex + 1 <= Model.TotalPages)
+                    {
+                        if (Model.PageSize < Model.TotalPages)
+                        {
+                            <span class="page-link">...</span>
+                        }
+                    }
+                </li>
+                <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                    @if (Model.PageIndex + 1 <= Model.TotalPages)
+                    {
+                        if (Model.PageSize < Model.TotalPages)
+                        {
+                            <a asp-route-pageNumber="@Model.TotalPages"
+                               asp-route-query="@Model.Query"
+                               class="page-link">
+                                @Model.TotalPages
+                            </a>
+                        }
+                    }
+                </li>
+                <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                    @if (Model.PageIndex + 1 < Model.TotalPages)
+                    {
+                        <a asp-route-pageNumber="@(Model.PageIndex + 1)"
+                           asp-route-query="@Model.Query"
+                           class="page-link">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-route-pageNumber="@(Model.TotalPages)"
+                           asp-route-query="@Model.Query"
+                           class="page-link">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    }
+                </li>
+            </ul>
+        </nav>
+    </div>
+}
+else
+{
+    <p>No data! Check query or create new <a asp-page="/Groups/Create">link group.</a>.</p>
+}

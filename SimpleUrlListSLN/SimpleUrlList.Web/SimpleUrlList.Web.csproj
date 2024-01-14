@@ -16,5 +16,6 @@
     <ItemGroup>
       <ProjectReference Include="..\SimpleUrlList.Interfaces\SimpleUrlList.Interfaces.csproj" />
       <ProjectReference Include="..\SimpleUrlList.Shared\SimpleUrlList.Shared.csproj" />
+      <ProjectReference Include="..\SimpleUrlList.SQL\SimpleUrlList.SQL.csproj" />
     </ItemGroup>    
 </Project>

@@ -11,7 +11,7 @@ public class SulUserService(string connectionString) : BaseRepository<SulUser>(c
     public override async Task<List<SulUser>> GetAsync()
     {
         await using var connection = new SqlConnection(connectionString);
-        var sql = "SELECT U.UserId as SulUserId, U.FullName, U.Email, U.Password FROM Users U";
+        var sql = "SELECT U.UserId, U.FullName, U.Email, U.Password FROM Users U";
         var SulUsers = await connection.QueryAsync<SulUser>(sql);
         return SulUsers.ToList();
     }
@@ -40,7 +40,7 @@ public class SulUserService(string connectionString) : BaseRepository<SulUser>(c
         return sulUser;
     }
 
-    public async Task<SulUser> LoginAsync(string username, string password)
+    public async Task<SulUser?> LoginAsync(string username, string password)
     {
         await using var connection = new SqlConnection(connectionString);
         var item = await connection.QuerySingleOrDefaultAsync<SulUser>(

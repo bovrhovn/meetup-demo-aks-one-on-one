@@ -1,0 +1,65 @@
+﻿@page "{linkGroupId}"
+@model SimpleUrlList.Web.Pages.Groups.DetailsPageModel
+
+@{
+    var name = Model.LinkGroup.Name;
+    ViewData["Title"] = "Link groups " + name;
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/User/Dashboard">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-page="/Group/Index">Link groups search</a>
+        </li>
+        <li aria-current="page"
+            class="breadcrumb-item active">
+            Details about @name
+        </li>
+    </ol>
+}
+
+<h3>
+    Details about @name
+    <small>created <b>@Model.LinkGroup.CreatedAt.ToString("dd.MM.yyyy")</b> from0 <b>@Model.LinkGroup.User.FullName</b></small>
+</h3>
+
+<p class="text-info">@Model.LinkGroup.Description</p>
+
+@if (Model.LinkGroup.Links.Any())
+{
+    <div class="row" id="tDiv">
+        <div class="col">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <td>Name</td>
+                    <td>Link</td>
+                </tr>
+                </thead>
+                @foreach (var linkGroupLink in Model.LinkGroup.Links)
+                {
+                    <tr>
+                        <td class="w-50">
+                            <a href="@linkGroupLink.Url" target="_blank">@linkGroupLink.Name</a>
+                        </td>
+                        <td class="w-50">@linkGroupLink.Url</td>
+                    </tr>
+                }
+            </table>
+        </div>
+        <div class="col-3">
+            <div class="card text-bg-light mb-3">
+                <div class="card-header">Downloaded</div>
+                <div class="card-body">
+                    <span class="badge rounded-pill text-bg-light text-center">
+                        <p class="fs-1">@Model.LinkGroup.Clicked</p>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+}
