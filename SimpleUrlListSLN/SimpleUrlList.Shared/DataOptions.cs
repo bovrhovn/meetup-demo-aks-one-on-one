@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SimpleUrlList.Web.Options;
+namespace SimpleUrlList.Shared;
 
 public class DataOptions
 {

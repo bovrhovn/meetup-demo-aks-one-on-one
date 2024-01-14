@@ -8,4 +8,5 @@ public static class ConstantRouteHelper
     public const string GetSettingsRoute = "get";
     public const string GetEventsRoute = "get";
     public const string AddEventRoute = "add";
+    public const string LinkGroupBaseRoute = "lg";
 }
