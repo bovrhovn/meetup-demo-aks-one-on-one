@@ -6,4 +6,5 @@ public static class ConstantRouteHelper
     public const string RedirectRoute = "rd";
     public const string LinkGroupBaseRoute = "lg";
     public const string AddLinksRoute = "add-links";
+    public const string GetLinkGroupsRoute = "get-all";
 }

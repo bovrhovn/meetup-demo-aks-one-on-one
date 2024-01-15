@@ -1,8 +1,9 @@
 ﻿@page "{linkGroupId}"
 @using Microsoft.Extensions.Options
 @using SimpleUrlList.Shared
+@using SimpleUrlList.Web.Options
 @model SimpleUrlList.Web.Pages.Groups.LinksPageModel
-@inject IOptions<AuthOptions> AuthOptions
+@inject IOptions<AppOptions> AppOptions
 @{
     var name = Model.CurrentLinkGroup.Name;
     ViewData["Title"] = "Links for " + name;
@@ -53,6 +54,19 @@
         <th>Link</th>
         <th class="text-center">...</th>
     </tr>
+    @if (Model.CurrentLinkGroup.Links.Any())
+    {
+        foreach (var link in Model.CurrentLinkGroup.Links)
+        {
+            <tr>
+                <td>@link.Name</td>
+                <td>@link.Url</td>
+                <td class="text-center">
+                    <button onclick="deleteRow(this)">Delete</button>
+                </td>
+            </tr>
+        }
+    }
 </table>
 
 <div class="mb-3">
@@ -98,28 +112,37 @@
         }
         
         function SaveLinks() {
-            let inputs = document.getElementById("tbLinks");            
-            if (inputs === null || inputs.length === 0) {
+            let table = document.getElementById("tbLinks");            
+            if (table === null || table.length === 0) {
                alert("No links to save!");
                 return;
             }     
             const searchApiBase = '@ConstantRouteHelper.LinkGroupBaseRoute' + '/@ConstantRouteHelper.AddLinksRoute';
-            let url = '@AuthOptions.Value.BaseUrl' + searchApiBase;           
+            let url = '@AppOptions.Value.ApiUrl' + searchApiBase;      
+            console.log("Url is: " + url);
             let list = [];
-            for (let i = 0; i < inputs.length; i++) {
-                let row = inputs[i];
-                let name = row.cells[0].innerHTML;
-                let link = row.cells[1].innerHTML;
-                let item = {
-                    Name : name,
-                    Link : link
-                };
-                list.push(item);
+            for (let i = 1; i < table.rows.length; i++) {
+                let row = table.rows[i];                
+                let name = row.cells[0].innerHTML;                
+                let link = row.cells[1].innerHTML;                
+                // let item = {
+                //     Name : name,
+                //     Link : link
+                // };
+                list.push(new linkViewModel(name,link));            
             }
+            
+            if (list.length < 0) {
+                console.log("Empty list");
+                alert("No urls has been added!");
+                return;                
+            }
+            
             let data = {
                LinkGroupId : '@Model.LinkGroupId',               
-               Links : list  
+               Links : list 
             };
+            console.log(data);
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -135,5 +158,10 @@
               })
               .catch(error => console.error('Unable to add links to link group.', error));
         }
+        
+         function linkViewModel(Name,Url) {
+            this.Name = Name;
+            this.Url = Url;                    
+         }
     </script>
 }

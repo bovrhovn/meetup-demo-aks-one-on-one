@@ -5,6 +5,7 @@
       <Path>../Docker</Path>
       <Path>../Scripts</Path>
       <Path>../Yaml</Path>
+      <Path>../../../Settings</Path>
     </attachedFolders>
     <explicitIncludes />
     <explicitExcludes />

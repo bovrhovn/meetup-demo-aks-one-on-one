@@ -33,5 +33,6 @@ RUN dotnet publish "SimpleUrlList.Web/SimpleUrlList.Web.csproj" -c Release -o /a
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 as final
 WORKDIR /app
+ENV ASPNETCORE_HTTP_PORTS=80
 COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "SimpleUrlList.Web.dll"]

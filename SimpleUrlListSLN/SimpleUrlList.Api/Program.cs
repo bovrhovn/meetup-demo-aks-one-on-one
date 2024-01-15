@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using SimpleUrlList.Api.Authentication;
@@ -24,6 +25,14 @@ builder.Services.AddScoped<ILinkRepository, LinkRepository>(_ => new LinkReposit
 builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(new CorsPolicyBuilder()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowAnyOrigin()
+        .Build());
+});
 builder.Services.AddSwaggerGen(conf =>
 {
     conf.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
@@ -60,6 +69,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRouting();
+app.UseCors();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHealthChecks("/" + ConstantRouteHelper.HealthRoute, new HealthCheckOptions

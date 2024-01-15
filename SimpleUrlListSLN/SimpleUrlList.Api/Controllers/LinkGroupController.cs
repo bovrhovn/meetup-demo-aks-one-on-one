@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleUrlList.Api.ViewModels;
 using SimpleUrlList.Interfaces;
+using SimpleUrlList.Models;
 using SimpleUrlList.Shared;
 
 namespace SimpleUrlList.Api.Controllers;
@@ -24,6 +25,30 @@ public class LinkGroupController(
     {
         logger.LogInformation("Called alive endpoint at {DateCalled}", DateTime.UtcNow);
         return new ContentResult { StatusCode = 200, Content = $"I am alive at {DateTime.Now}" };
+    }
+
+    [HttpGet]
+    [Route(ConstantRouteHelper.GetLinkGroupsRoute)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllLinkGroupsAsync()
+    {
+        logger.LogInformation("Called getting live group at {DateCalled}", DateTime.UtcNow);
+        var linkGroups = await linkGroupRepository.GetAsync();
+        logger.LogInformation("Found {LinkGroupCount} link groups", linkGroups.Count);
+
+        var list = new List<SimpleLinkGroupViewModel>();
+        foreach (var linkGroup in linkGroups)
+        {
+            list.Add(new SimpleLinkGroupViewModel
+            {
+                Name = linkGroup.Name,
+                CreatedAt = linkGroup.CreatedAt,
+                Links = linkGroup.Links
+            });
+        }
+
+        return Ok(list);
     }
 
     [HttpGet]
@@ -52,7 +77,7 @@ public class LinkGroupController(
             return new ContentResult { StatusCode = 502, Content = $"Error redirecting to link group {shortName}" };
         }
     }
-    
+
     [HttpPost]
     [Route(ConstantRouteHelper.AddLinksRoute)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -60,7 +85,8 @@ public class LinkGroupController(
     [AllowAnonymous]
     public async Task<IActionResult> AddLinksToLinkGroupAsync([FromBody] LinkGroupViewModel linkGroupView)
     {
-        logger.LogInformation("Adding links to Link Group {LinkGroupId} at {DateCalled}", linkGroupView.LinkGroupId, DateTime.Now);
+        logger.LogInformation("Adding links to Link Group {LinkGroupId} at {DateCalled}", linkGroupView.LinkGroupId,
+            DateTime.Now);
         try
         {
             var linkGroup = await linkGroupRepository.DetailsAsync(linkGroupView.LinkGroupId);
@@ -69,7 +95,15 @@ public class LinkGroupController(
                 logger.LogError("Could not find link group {LinkGroupId}", linkGroupView.LinkGroupId);
                 return BadRequest();
             }
-            await linkGroupRepository.AddLinksToLinkGroupAsync(linkGroupView.LinkGroupId, linkGroupView.Links);
+
+            await linkGroupRepository.AddLinksToLinkGroupAsync(linkGroupView.LinkGroupId,
+                linkGroupView.Links.Select(currentLink => new Link
+                {
+                    LinkId = Guid.NewGuid(),
+                    Group = new LinkGroup { LinkGroupId = Guid.Parse(linkGroupView.LinkGroupId) },
+                    Name = currentLink.Name,
+                    Url = currentLink.Url
+                }).ToList());
             logger.LogInformation("Added links to Link Group {LinkGroupId}", linkGroupView.LinkGroupId);
             return Ok();
         }

@@ -59,8 +59,10 @@ public class LinkGroupRepository(string connectionString)
     {
         await using var connection = new SqlConnection(connectionString);
         var sql = "SELECT G.LinkGroupId, G.Name, G.Description, G.ShortName, " +
-                  "G.UserId,G.Clicked,G.CategoryId,G.CreatedAt, C.CategoryId, C.Name FROM LinkGroups G " +
-                  "JOIN Categories C ON G.CategoryId = C.CategoryId ";
+                  "G.UserId,G.Clicked,G.CategoryId,G.CreatedAt, C.CategoryId, C.Name, L.LinkId, L.Name, L.Url " +
+                  "FROM LinkGroups G " +
+                  "JOIN Categories C ON G.CategoryId = C.CategoryId "+
+                  "LEFT JOIN Links L on L.LinkGroupId=G.LinkGroupId ";
 
         if (!string.IsNullOrEmpty(query))
             sql +=
@@ -68,13 +70,15 @@ public class LinkGroupRepository(string connectionString)
 
         var grid = await connection.QueryMultipleAsync(sql);
         var lookup = new Dictionary<Guid, LinkGroup>();
-        grid.Read<LinkGroup, Category, LinkGroup>((linkGroup, category) =>
+        grid.Read<LinkGroup, Category, Link, LinkGroup>((linkGroup, category, link) =>
         {
             linkGroup.Category = category;
             if (!lookup.TryGetValue(linkGroup.LinkGroupId, out _))
                 lookup.Add(linkGroup.LinkGroupId, linkGroup);
+            if (link == null) return linkGroup;
+            lookup[linkGroup.LinkGroupId].Links.Add(link);
             return linkGroup;
-        }, splitOn: "CategoryId");
+        }, splitOn: "CategoryId,LinkId");
 
         return PaginatedList<LinkGroup>.Create(lookup.Values.AsQueryable(), page, pageSize, query);
     }
@@ -97,11 +101,11 @@ public class LinkGroupRepository(string connectionString)
         var category = await result.ReadSingleAsync<Category>();
         var links = await result.ReadAsync<Link>();
         var user = await result.ReadSingleAsync<SulUser>();
-        
+
         linkGroup.Category = category;
         linkGroup.Links = links.ToList();
         linkGroup.User = user;
-        
+
         return linkGroup;
     }
 
@@ -109,18 +113,23 @@ public class LinkGroupRepository(string connectionString)
     {
         await using var connection = new SqlConnection(connectionString);
         var sql = "SELECT G.LinkGroupId, G.Name, G.Description, G.ShortName, " +
-                  "G.UserId,G.Clicked,G.CategoryId,G.CreatedAt, C.CategoryId, C.Name FROM LinkGroups G " +
-                  "JOIN Categories C ON G.CategoryId = C.CategoryId WHERE G.UserId=@userId";
+                  "G.UserId,G.Clicked,G.CategoryId,G.CreatedAt, C.CategoryId, C.Name, " +
+                  "L.LinkId, L.Name, L.Url FROM LinkGroups G " +
+                  "JOIN Categories C ON G.CategoryId = C.CategoryId " +
+                  "LEFT JOIN Links L on L.LinkGroupId=G.LinkGroupId " +
+                  "WHERE G.UserId=@userId";
 
         var grid = await connection.QueryMultipleAsync(sql, new { userId });
         var lookup = new Dictionary<Guid, LinkGroup>();
-        grid.Read<LinkGroup, Category, LinkGroup>((linkGroup, category) =>
+        grid.Read<LinkGroup, Category, Link, LinkGroup>((linkGroup, category, link) =>
         {
             linkGroup.Category = category;
             if (!lookup.TryGetValue(linkGroup.LinkGroupId, out _))
                 lookup.Add(linkGroup.LinkGroupId, linkGroup);
+            if (link == null) return linkGroup;
+            lookup[linkGroup.LinkGroupId].Links.Add(link);
             return linkGroup;
-        }, splitOn: "CategoryId");
+        }, splitOn: "CategoryId,LinkId");
         return lookup.Values.ToList();
     }
 
@@ -158,9 +167,9 @@ public class LinkGroupRepository(string connectionString)
         await using var connection = new SqlConnection(connectionString);
 
         var query = "SELECT G.LinkGroupId FROM LinkGroups G WHERE G.ShortName=@shortName";
-        var linkGroupId = await connection.QuerySingleAsync<string>(query, new { shortName });
+        var linkGroupId = await connection.QuerySingleAsync<Guid>(query, new { shortName });
 
-        var group = await DetailsAsync(linkGroupId);
+        var group = await DetailsAsync(linkGroupId.ToString());
         group.Clicked += 1;
 
         try
