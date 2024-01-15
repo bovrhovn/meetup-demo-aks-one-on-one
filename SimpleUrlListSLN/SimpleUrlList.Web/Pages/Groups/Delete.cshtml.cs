@@ -18,7 +18,7 @@ public class DeletePageModel(ILogger<DeletePageModel> logger, ILinkGroupReposito
 
     public async Task<IActionResult> OnPostAsync()
     {
-        LinkGroupId = DeleteLinkGroup.LinkGroupId;
+        LinkGroupId = DeleteLinkGroup.LinkGroupId.ToString();
         logger.LogInformation("Called Delete endpoint at {DateCalled} from id {LinkGroupId}", DateTime.UtcNow,
             LinkGroupId);
         try

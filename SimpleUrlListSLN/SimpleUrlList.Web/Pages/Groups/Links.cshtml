@@ -38,8 +38,8 @@
     <input class="form-control" required="required" id="tbName" type="text">
 </div>
 <div class="mb-3">
-    <label for="tbLink" class="form-label">Link</label>
-    <input class="form-control" required="required" id="tbLink" type="text">
+    <label for="tbUrl" class="form-label">Link</label>
+    <input class="form-control" required="required" id="tbUrl" type="text">
 </div>
 <div class="mb-3">
     <button class="btn btn-primary mr-3 mt-2" onclick="AddLink()">
@@ -66,15 +66,28 @@
 {
     <script type="text/javascript">
         function AddLink() {
-            let name = document.getElementById("#tbName").val();
-            let link = document.getElementById("#tbLink").val();
+            let name = document.getElementById("tbName").value;
+            let link = document.getElementById("tbUrl").value;
+            
+            console.log("Adding link " + name + " with " + link);
+            
             if (name === '' || link === '') {
                 alert("Name and link are required!");
                 return;
             }
-            let dataDiv = document.getElementById("tbLinks");            
-            let html="<tr><td>" + name + "</td><td>" + link + "</td><td class='text-center'><button onclick='deleteRow(this)'>Delete</button></td></tr>";            
-            dataDiv.append(html);
+            let table = document.getElementById("tbLinks");
+            let row = table.insertRow(-1);
+            let cellName = row.insertCell(-1);
+            let cellLink = row.insertCell(-1);
+            let cellButton = row.insertCell(-1);
+            
+            cellName.innerHTML = name;
+            cellLink.innerHTML = link;
+            cellButton.className = "text-center";
+            cellButton.innerHTML = "<button onclick='deleteRow(this)'>Delete</button>";
+
+            document.getElementById("tbName").value = '';
+            document.getElementById("tbUrl").value = '';
         }
         
         function deleteRow(btn) {

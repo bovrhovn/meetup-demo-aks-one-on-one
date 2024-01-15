@@ -20,23 +20,32 @@ public class SulUserService(string connectionString) : BaseRepository<SulUser>(c
     {
         await using var connection = new SqlConnection(connectionString);
         entity.Password = PasswordHash.CreateHash(entity.Password);
-        var item = await connection.ExecuteScalarAsync(
-            $"INSERT INTO Users(FullName,Email,Password)VALUES(@{nameof(entity.FullName)},@{nameof(entity.Email)},@{nameof(entity.Password)});SELECT CAST(SCOPE_IDENTITY() as bigint)",
-            entity);
-        var userId = Convert.ToInt64(item);
-        entity.UserId = userId.ToString();
+        entity.UserId = Guid.NewGuid();
+        var itemAffected = await connection.ExecuteAsync(
+            "INSERT INTO Users(UserId, FullName,Email,Password)VALUES(@uid,@fn,@em,@pwd)",
+            new
+            {
+                uid = entity.UserId,
+                fn = entity.FullName,
+                em = entity.Email,
+                pwd = entity.Password
+            });
         return entity;
     }
 
     public override async Task<SulUser> DetailsAsync(string entityId)
     {
         await using var connection = new SqlConnection(connectionString);
-        var query = "SELECT U.UserId as SulUserId, U.FullName, U.Email, U.Password FROM Users U WHERE U.UserId=@entityId;" +
-                    "SELECT T.* FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId WHERE T.UserId=@entityId;" +
-                    "SELECT F.* FROM UserSetting F WHERE F.UserId=@entityId;";
+        var query =
+            "SELECT U.UserId, U.FullName, U.Email, U.Password FROM Users U WHERE U.UserId=@entityId;" +
+            "SELECT G.LinkGroupId, G.Name, G.Description, G.ShortName, G.UserId,G.Clicked,G.CategoryId," +
+            "G.CreatedAt, C.CategoryId, C.Name FROM LinkGroups G JOIN Categories C on C.CategoryId=G.CategoryId " +
+            "WHERE G.UserId=@entityId";
 
         var result = await connection.QueryMultipleAsync(query, new { entityId });
         var sulUser = await result.ReadSingleAsync<SulUser>();
+        var linkGroupUsers = await result.ReadAsync<LinkGroup>();
+        sulUser.Groups = linkGroupUsers.ToList();
         return sulUser;
     }
 
@@ -48,7 +57,7 @@ public class SulUserService(string connectionString) : BaseRepository<SulUser>(c
 
         if (item == null) return null;
 
-        item = await DetailsAsync(item.UserId);
+        item = await DetailsAsync(item.UserId.ToString());
 
         var validateHash = PasswordHash.ValidateHash(password, item.Password);
         return validateHash ? item : null;

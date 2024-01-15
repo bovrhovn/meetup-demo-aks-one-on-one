@@ -9,9 +9,11 @@ using SimpleUrlList.SQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// builder.Services.AddOptions<AuthOptions>()
+//     .Bind(builder.Configuration.GetSection(SettingsNameHelper.AuthOptionsSectionName))
+//     .ValidateDataAnnotations();
 builder.Services.AddOptions<AuthOptions>()
-    .Bind(builder.Configuration.GetSection(SettingsNameHelper.AuthOptionsSectionName))
-    .ValidateDataAnnotations();
+    .Bind(builder.Configuration.GetSection(SettingsNameHelper.AuthOptionsSectionName));
 builder.Services.AddHealthChecks();
 var sqlOptions = builder.Configuration.GetSection(SettingsNameHelper.DataOptionsSectionName).Get<DataOptions>();
 var sqlConnectionString = sqlOptions!.ConnectionString;

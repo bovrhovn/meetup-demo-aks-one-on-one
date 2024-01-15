@@ -15,7 +15,7 @@ public class UserDataContext(IHttpContextAccessor httpContextAccessor) : IUserDa
         currentUser.Fullname = claimName!.Value;
 
         var claimId = httpContextUser?.FindFirst(ClaimTypes.NameIdentifier);
-        currentUser.UserId = claimId!.Value;
+        currentUser.UserId = Guid.Parse(claimId!.Value);
 
         var claimEmail = httpContextUser!.FindFirst(ClaimTypes.Email);
         currentUser.Email = claimEmail!.Value;

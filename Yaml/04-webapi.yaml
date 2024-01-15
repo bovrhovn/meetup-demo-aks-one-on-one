@@ -7,19 +7,19 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sul-back
+      app: back
   template:
     metadata:
       labels:
-        app: sul-back
+        app: back
     spec:
       nodeSelector:
         "kubernetes.io/os": linux
       containers:
         - name: sul-back
-          image: mcr.azurecr.io/sul/webclient:1.0:v1
+          image: meetupsul.azurecr.io/web:novalidate
           env:
-            - name: SqlOptions__ConnectionString
+            - name: DataOptions__ConnectionString
               value: ""
           resources:
             requests:

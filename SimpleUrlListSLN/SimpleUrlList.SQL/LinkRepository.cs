@@ -21,7 +21,7 @@ public class LinkRepository(string connectionString)
                 $"WHERE G.Name LIKE '%{query}%' OR G.Description LIKE '%{query}%' OR G.ShortName LIKE '%{query}%' OR L.Name LIKE '%{query}%'";
 
         var grid = await connection.QueryMultipleAsync(sql);
-        var lookup = new Dictionary<string, Link>();
+        var lookup = new Dictionary<Guid, Link>();
         grid.Read<Link, LinkGroup, Link>((link, linkGroup) =>
         {
             link.Group = linkGroup;

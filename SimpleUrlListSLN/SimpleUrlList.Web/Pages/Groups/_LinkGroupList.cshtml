@@ -31,11 +31,11 @@
                 <tr>
                     <td>@linkGroup.Category.Name</td>
                     <td>
-                        <a asp-page="/Groups/Details" asp-route-id="@linkGroup.LinkGroupId">
+                        <a asp-page="/Groups/Details" asp-route-linkGroupId="@linkGroup.LinkGroupId.ToString()">
                             @linkGroup.Name
                         </a>
                         <br/>
-                        <small>created<b>@linkGroup.CreatedAt.ToString("dd.MM.yyyy")</b> from user <b>@linkGroup.User.FullName</b></small>
+                        <small>created<b>@linkGroup.CreatedAt.ToString("dd.MM.yyyy")</b></small>
                     </td>
                     <td>
                         @linkGroup.Description
@@ -45,12 +45,12 @@
                     </td>
                     <td>
                         <a asp-page="/Groups/Create"
-                           asp-route-linkGroupId="@linkGroup.LinkGroupId">
+                           asp-route-linkGroupId="@linkGroup.LinkGroupId.ToString()">
                             <i class="fas fa-edit"></i>
                         </a>
                         &nbsp;&nbsp;
                         <a asp-page="/Groups/Delete"
-                           asp-route-linkGroupId="@linkGroup.LinkGroupId">
+                           asp-route-linkGroupId="@linkGroup.LinkGroupId.ToString()">
                             <i class="fas fa-trash-alt"></i>
                         </a>
                     </td>

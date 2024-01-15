@@ -57,6 +57,7 @@ public class LinkGroupController(
     [Route(ConstantRouteHelper.AddLinksRoute)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [AllowAnonymous]
     public async Task<IActionResult> AddLinksToLinkGroupAsync([FromBody] LinkGroupViewModel linkGroupView)
     {
         logger.LogInformation("Adding links to Link Group {LinkGroupId} at {DateCalled}", linkGroupView.LinkGroupId, DateTime.Now);

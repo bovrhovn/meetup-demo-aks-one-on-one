@@ -17,7 +17,7 @@ public class DashboardPageModel(
         var userViewModel = userDataContext.GetCurrentUser();
         logger.LogInformation("Loading dashboard for user {User} - starting at {DateStart}", userViewModel.Fullname,
             DateTime.Now);
-        MyLinkGroups = await linkGroupRepository.GetFromSpecificUserAsync(userViewModel.UserId);
+        MyLinkGroups = await linkGroupRepository.GetFromSpecificUserAsync(userViewModel.UserId.ToString());
         logger.LogInformation("Loading dashboard for user {User} - finished at {DateEnd} - with {LinkGroupCount}",
             userViewModel.Fullname,
             DateTime.Now, MyLinkGroups.Count);

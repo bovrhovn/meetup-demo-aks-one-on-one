@@ -10,15 +10,22 @@ using SimpleUrlList.Web.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// builder.Services.AddOptions<AuthOptions>()
+//     .Bind(builder.Configuration.GetSection(SettingsNameHelper.AuthOptionsSectionName))
+//     .ValidateDataAnnotations();
+// builder.Services.AddOptions<AppOptions>()
+//     .Bind(builder.Configuration.GetSection(SettingsNameHelper.AppOptionsSectionName))
+//     .ValidateDataAnnotations();
+// builder.Services.AddOptions<DataOptions>()
+//     .Bind(builder.Configuration.GetSection(SettingsNameHelper.DataOptionsSectionName))
+//     .ValidateDataAnnotations();
+
 builder.Services.AddOptions<AuthOptions>()
-    .Bind(builder.Configuration.GetSection(SettingsNameHelper.AuthOptionsSectionName))
-    .ValidateDataAnnotations();
+    .Bind(builder.Configuration.GetSection(SettingsNameHelper.AuthOptionsSectionName));
 builder.Services.AddOptions<AppOptions>()
-    .Bind(builder.Configuration.GetSection(SettingsNameHelper.AppOptionsSectionName))
-    .ValidateDataAnnotations();
+    .Bind(builder.Configuration.GetSection(SettingsNameHelper.AppOptionsSectionName));
 builder.Services.AddOptions<DataOptions>()
-    .Bind(builder.Configuration.GetSection(SettingsNameHelper.DataOptionsSectionName))
-    .ValidateDataAnnotations();
+    .Bind(builder.Configuration.GetSection(SettingsNameHelper.DataOptionsSectionName));
 
 builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();

@@ -20,8 +20,10 @@ namespace SimpleUrlList.SQL
         {
             await using var connection = new SqlConnection(connectionString);
             var categories = await connection.QueryAsync<Category>(
-                "SELECT C.CategoryId, C.Name FROM Category C");
+                "SELECT C.CategoryId, C.Name FROM Categories C");
             return categories.ToList();
         }
+
+        public override async Task<List<Category>> GetAsync() => await GetAllAsync();
     }
 }

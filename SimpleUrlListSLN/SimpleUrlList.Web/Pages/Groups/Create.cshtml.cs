@@ -32,7 +32,16 @@ public class CreatePageModel(
         var form = await Request.ReadFormAsync();
         var categoryId = form["ddlCategory"];
 
-        CreateLinkGroup.Category = new Category { CategoryId = categoryId };
+        if (string.IsNullOrEmpty(categoryId))
+        {
+            logger.LogInformation("Category is null or empty");
+            Message = "Category is required";
+            return Page();
+        }
+
+        var catId = Guid.Parse(categoryId!);
+
+        CreateLinkGroup.Category = new Category { CategoryId = catId };
         var userViewModel = userDataContext.GetCurrentUser();
         CreateLinkGroup.User = new SulUser { UserId = userViewModel.UserId };
         logger.LogInformation("Setting category {CategoryId} and user {UserId}", categoryId, userViewModel.UserId);
@@ -62,6 +71,6 @@ public class CreatePageModel(
     }
 
     [BindProperty(SupportsGet = true)] public string LinkGroupId { get; set; }
-    [BindProperty] public LinkGroup CreateLinkGroup { get; set; }
+    [BindProperty] public LinkGroup CreateLinkGroup { get; set; } = new();
     [BindProperty] public List<Category> Categories { get; set; }
 }

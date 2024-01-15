@@ -14,12 +14,14 @@ public class LinkGroupRepository(string connectionString)
     {
         await using var connection = new SqlConnection(connectionString);
         entity.CreatedAt = DateTime.Now;
+        entity.LinkGroupId = Guid.NewGuid();
         var sql =
-            $"INSERT INTO LinkGroups(Name, Description,ShortName,UserId,Clicked,CategoryId,CreatedAt)" +
-            $"VALUES (@name,@desc,@shortName,@userId,@clicked,@catId,@created);" +
-            "SELECT SCOPE_IDENTITY()";
-        var item = await connection.ExecuteScalarAsync(sql, new
+            $"INSERT INTO LinkGroups(LinkGroupId,Name, Description,ShortName,UserId,Clicked,CategoryId,CreatedAt)" +
+            $"VALUES (@lgId,@name,@desc,@shortName,@userId,@clicked,@catId,@created);";
+
+        await connection.ExecuteAsync(sql, new
         {
+            lgId = entity.LinkGroupId,
             name = entity.Name,
             desc = entity.Description,
             shortName = entity.ShortName,
@@ -29,10 +31,8 @@ public class LinkGroupRepository(string connectionString)
             created = entity.CreatedAt
         });
 
-        entity.LinkGroupId = item.ToString() ?? string.Empty;
-
         if (entity.Links != null && entity.Links.Any())
-            await SaveLinksToDatabaseAsync(entity.LinkGroupId, entity.Links.ToArray());
+            await SaveLinksToDatabaseAsync(entity.LinkGroupId.ToString(), entity.Links.ToArray());
 
         return entity;
     }
@@ -41,12 +41,13 @@ public class LinkGroupRepository(string connectionString)
     {
         await using var connection = new SqlConnection(connectionString);
         var sql =
-            $"INSERT INTO Links(Name, Url,LinkGroupId)" +
-            $"VALUES (@name,@url,@lgId)";
+            $"INSERT INTO Links(LinkId,Name, Url,LinkGroupId)" +
+            $"VALUES (@lid,@name,@url,@lgId)";
         foreach (var link in links)
         {
             await connection.ExecuteAsync(sql, new
             {
+                lid = Guid.NewGuid().ToString(),
                 name = link.Name,
                 url = link.Url,
                 lgId = linkGroupId
@@ -66,7 +67,7 @@ public class LinkGroupRepository(string connectionString)
                 $"WHERE G.Name LIKE '%{query}%' OR G.Description LIKE '%{query}%' OR G.ShortName LIKE '%{query}%' OR C.Name LIKE '%{query}%'";
 
         var grid = await connection.QueryMultipleAsync(sql);
-        var lookup = new Dictionary<string, LinkGroup>();
+        var lookup = new Dictionary<Guid, LinkGroup>();
         grid.Read<LinkGroup, Category, LinkGroup>((linkGroup, category) =>
         {
             linkGroup.Category = category;
@@ -86,15 +87,21 @@ public class LinkGroupRepository(string connectionString)
             "FROM LinkGroups G WHERE G.LinkGroupId=@entityId;" +
             "SELECT P.CategoryId, P.Name FROM Categories P " +
             "JOIN LinkGroups S on S.CategoryId=P.CategoryId WHERE S.LinkGroupId=@entityId;" +
-            "SELECT L.LinkId, L.Name, L.Url, L.Description, L.ShortName, L.UserId, L.Clicked, L.LinkGroupId, L.CreatedAt " +
-            "FROM Links L JOIN LinkGroups S on S.LinkGroupId=L.LinkGroupId WHERE S.LinkGroupId=@entityId";
+            "SELECT L.LinkId, L.Name, L.Url, L.LinkGroupId " +
+            "FROM Links L JOIN LinkGroups S on S.LinkGroupId=L.LinkGroupId WHERE S.LinkGroupId=@entityId;" +
+            "SELECT U.UserId, U.Email, U.Fullname FROM Users U " +
+            "JOIN LinkGroups P ON P.UserId=U.UserId WHERE P.LinkGroupId=@entityId;";
 
         var result = await connection.QueryMultipleAsync(query, new { entityId });
         var linkGroup = await result.ReadSingleAsync<LinkGroup>();
         var category = await result.ReadSingleAsync<Category>();
         var links = await result.ReadAsync<Link>();
+        var user = await result.ReadSingleAsync<SulUser>();
+        
         linkGroup.Category = category;
         linkGroup.Links = links.ToList();
+        linkGroup.User = user;
+        
         return linkGroup;
     }
 
@@ -106,7 +113,7 @@ public class LinkGroupRepository(string connectionString)
                   "JOIN Categories C ON G.CategoryId = C.CategoryId WHERE G.UserId=@userId";
 
         var grid = await connection.QueryMultipleAsync(sql, new { userId });
-        var lookup = new Dictionary<string, LinkGroup>();
+        var lookup = new Dictionary<Guid, LinkGroup>();
         grid.Read<LinkGroup, Category, LinkGroup>((linkGroup, category) =>
         {
             linkGroup.Category = category;
@@ -134,15 +141,15 @@ public class LinkGroupRepository(string connectionString)
             clicked = entity.Clicked,
             catId = entity.Category.CategoryId
         });
-        
+
         if (!entity.Links.Any()) return resultAffected > 0;
-        
+
         query = "DELETE FROM Links WHERE LinkGroupId=@linkGroupId";
         await connection.ExecuteAsync(query, new
         {
             linkGroupId = entity.LinkGroupId
         });
-        await SaveLinksToDatabaseAsync(entity.LinkGroupId, entity.Links.ToArray());
+        await SaveLinksToDatabaseAsync(entity.LinkGroupId.ToString(), entity.Links.ToArray());
         return resultAffected > 0;
     }
 
@@ -180,6 +187,7 @@ public class LinkGroupRepository(string connectionString)
             Debug.WriteLine(e.Message);
             return false;
         }
+
         return true;
     }
 
@@ -192,7 +200,7 @@ public class LinkGroupRepository(string connectionString)
             "JOIN Categories C ON G.CategoryId = C.CategoryId ";
 
         var grid = await connection.QueryMultipleAsync(sql);
-        var lookup = new Dictionary<string, LinkGroup>();
+        var lookup = new Dictionary<Guid, LinkGroup>();
         grid.Read<LinkGroup, Category, LinkGroup>((linkGroup, category) =>
         {
             linkGroup.Category = category;

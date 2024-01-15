@@ -2,10 +2,10 @@
 kind: Service
 metadata:
   name: sulweb-service
-  namespace: sul
+  namespace: play
 spec:
   type: LoadBalancer
   ports:
     - port: 80
   selector:
-    app: sul-web
+    app: web

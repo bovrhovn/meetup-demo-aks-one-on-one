@@ -47,7 +47,7 @@
         <select asp-for="CreateLinkGroup.Category.CategoryId" class="form-control" name="ddlCategory">
             @foreach (var category in Model.Categories)
             {
-                if (string.IsNullOrEmpty(Model.CreateLinkGroup.LinkGroupId))
+                if (Model.CreateLinkGroup.LinkGroupId == Guid.Empty)
                 {
                     <option value="@category.CategoryId">@category.Name</option>
                 }
