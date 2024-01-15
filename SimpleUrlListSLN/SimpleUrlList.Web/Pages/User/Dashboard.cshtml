@@ -26,3 +26,56 @@
         </div>
     </div>
 </div>
+
+@if (Model.MyLinkGroups.Any())
+{
+    <table class="table table-hover"
+           id="tbData">
+        <caption>My Link groups</caption>
+        <thead class="table-dark">
+        <tr>
+            <th>Category</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th class="text-center">
+                Link count
+            </th>
+            <th>...</th>
+        </tr>
+        </thead>
+        @foreach (var linkGroup in Model.MyLinkGroups)
+        {
+            <tr>
+                <td>@linkGroup.Category.Name</td>
+                <td>
+                    <a asp-page="/Groups/Details" asp-route-id="@linkGroup.LinkGroupId">
+                        @linkGroup.Name
+                    </a>
+                    <br/>
+                    <small>created<b>@linkGroup.CreatedAt.ToString("dd.MM.yyyy")</b> from user <b>@linkGroup.User.FullName</b></small>
+                </td>
+                <td>
+                    @linkGroup.Description
+                </td>
+                <td class="text-center">
+                    @linkGroup.Links.Count
+                </td>
+                <td>
+                    <a asp-page="/Groups/Create"
+                       asp-route-linkGroupId="@linkGroup.LinkGroupId">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    &nbsp;&nbsp;
+                    <a asp-page="/Groups/Delete"
+                       asp-route-linkGroupId="@linkGroup.LinkGroupId">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <p class="text-info">No data available. <b>Add new group</b> by clicking link above.</p>
+}

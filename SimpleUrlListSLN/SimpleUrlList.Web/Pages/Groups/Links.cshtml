@@ -1,0 +1,126 @@
+﻿@page "{linkGroupId}"
+@using Microsoft.Extensions.Options
+@using SimpleUrlList.Shared
+@model SimpleUrlList.Web.Pages.Groups.LinksPageModel
+@inject IOptions<AuthOptions> AuthOptions
+@{
+    var name = Model.CurrentLinkGroup.Name;
+    ViewData["Title"] = "Links for " + name;
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/User/Dashboard">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-page="/Groups/Index">Link groups</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-page="/Groups/Create" asp-route-linkGroupId="@Model.LinkGroupId">
+                Link group @name
+            </a>
+        </li>
+        <li aria-current="page" class="breadcrumb-item active">
+            Add links
+        </li>
+    </ol>
+}
+
+<h3>
+    Links for @name
+    <small> created at @Model.CurrentLinkGroup.CreatedAt.ToString("dd.MM.yyyy")</small>
+</h3>
+
+<div class="mb-3">
+    <label for="tbName" class="form-label">Name</label>
+    <input class="form-control" required="required" id="tbName" type="text">
+</div>
+<div class="mb-3">
+    <label for="tbLink" class="form-label">Link</label>
+    <input class="form-control" required="required" id="tbLink" type="text">
+</div>
+<div class="mb-3">
+    <button class="btn btn-primary mr-3 mt-2" onclick="AddLink()">
+        Add <i class="fas fa-plus"></i>
+    </button>
+</div>
+<hr/>
+<table id="tbLinks" class="table table-light">
+    <tr>
+        <th>Name</th>
+        <th>Link</th>
+        <th class="text-center">...</th>
+    </tr>
+</table>
+
+<div class="mb-3">
+    <button class="btn btn-primary mr-3 mt-2" onclick="SaveLinks()">
+        Save <i class="fas fa-save"></i>
+    </button>
+    <a asp-page="/Groups/Create" asp-route-linkGroupId="@Model.LinkGroupId">Back to link group details</a>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function AddLink() {
+            let name = document.getElementById("#tbName").val();
+            let link = document.getElementById("#tbLink").val();
+            if (name === '' || link === '') {
+                alert("Name and link are required!");
+                return;
+            }
+            let dataDiv = document.getElementById("tbLinks");            
+            let html="<tr><td>" + name + "</td><td>" + link + "</td><td class='text-center'><button onclick='deleteRow(this)'>Delete</button></td></tr>";            
+            dataDiv.append(html);
+        }
+        
+        function deleteRow(btn) {
+            let table = document.getElementById("tbLinks");        
+            let row = btn.closest("tr");        
+            let index = row.rowIndex;        
+            table.deleteRow(index);
+        }
+        
+        function SaveLinks() {
+            let inputs = document.getElementById("tbLinks");            
+            if (inputs === null || inputs.length === 0) {
+               alert("No links to save!");
+                return;
+            }     
+            const searchApiBase = '@ConstantRouteHelper.LinkGroupBaseRoute' + '/@ConstantRouteHelper.AddLinksRoute';
+            let url = '@AuthOptions.Value.BaseUrl' + searchApiBase;           
+            let list = [];
+            for (let i = 0; i < inputs.length; i++) {
+                let row = inputs[i];
+                let name = row.cells[0].innerHTML;
+                let link = row.cells[1].innerHTML;
+                let item = {
+                    Name : name,
+                    Link : link
+                };
+                list.push(item);
+            }
+            let data = {
+               LinkGroupId : '@Model.LinkGroupId',               
+               Links : list  
+            };
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+              })
+              .then(result => {
+                   if (result.status === 200) {
+                      window.location.replace('@Url.Page("Index")');
+                   }            
+              })
+              .catch(error => console.error('Unable to add links to link group.', error));
+        }
+    </script>
+}

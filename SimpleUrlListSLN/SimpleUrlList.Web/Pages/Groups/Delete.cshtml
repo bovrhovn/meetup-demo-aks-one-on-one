@@ -1,0 +1,41 @@
+﻿@page "{linkGroupId}"
+@model SimpleUrlList.Web.Pages.Groups.DeletePageModel
+
+@{
+    var name = Model.DeleteLinkGroup.Name;
+    ViewData["Title"]= "Delete " + name;
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/User/Dashboard">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-page="/Groups/Index">Link groups</a>
+        </li>
+        <li aria-current="page"
+            class="breadcrumb-item active">
+            Delete @name 
+        </li>
+    </ol>
+}
+
+<h2 class="text-muted">Delete @name</h2>
+
+@if (string.IsNullOrEmpty(Model.Message))
+{
+    <p class="text-warning">@Model.Message</p>
+}
+
+<p class="text-info">Deleting @name. Do you want to continue?</p>
+
+<form method="post">
+    <input type="hidden" asp-for="DeleteLinkGroup.LinkGroupId"/>
+    <button class="btn btn-primary mr-2 mt-2"
+            type="submit">
+        I know what I am doing <i class="fas fa-trash-alt"></i>
+    </button>
+    <a asp-page="/Groups/Index">Cancel and go to group list</a>
+</form>

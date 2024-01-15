@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlClient;
+using System.Diagnostics;
 using Dapper;
 using SimpleUrlList.Interfaces;
 using SimpleUrlList.Models;
@@ -24,10 +25,10 @@ public class LinkGroupRepository(string connectionString)
             shortName = entity.ShortName,
             userId = entity.User.UserId,
             clicked = 0,
-            catId = entity.Category.CategordId,
+            catId = entity.Category.CategoryId,
             created = entity.CreatedAt
         });
-        
+
         entity.LinkGroupId = item.ToString() ?? string.Empty;
 
         if (entity.Links != null && entity.Links.Any())
@@ -35,7 +36,7 @@ public class LinkGroupRepository(string connectionString)
 
         return entity;
     }
-    
+
     private async Task SaveLinksToDatabaseAsync(string linkGroupId, Link[] links)
     {
         await using var connection = new SqlConnection(connectionString);
@@ -73,10 +74,10 @@ public class LinkGroupRepository(string connectionString)
                 lookup.Add(linkGroup.LinkGroupId, linkGroup);
             return linkGroup;
         }, splitOn: "CategoryId");
-        
+
         return PaginatedList<LinkGroup>.Create(lookup.Values.AsQueryable(), page, pageSize, query);
     }
-    
+
     public override async Task<LinkGroup> DetailsAsync(string entityId)
     {
         await using var connection = new SqlConnection(connectionString);
@@ -104,7 +105,7 @@ public class LinkGroupRepository(string connectionString)
                   "G.UserId,G.Clicked,G.CategoryId,G.CreatedAt, C.CategoryId, C.Name FROM LinkGroups G " +
                   "JOIN Categories C ON G.CategoryId = C.CategoryId WHERE G.UserId=@userId";
 
-        var grid = await connection.QueryMultipleAsync(sql, new {userId});
+        var grid = await connection.QueryMultipleAsync(sql, new { userId });
         var lookup = new Dictionary<string, LinkGroup>();
         grid.Read<LinkGroup, Category, LinkGroup>((linkGroup, category) =>
         {
@@ -114,6 +115,72 @@ public class LinkGroupRepository(string connectionString)
             return linkGroup;
         }, splitOn: "CategoryId");
         return lookup.Values.ToList();
+    }
+
+    public override async Task<bool> UpdateAsync(LinkGroup entity)
+    {
+        await using var connection = new SqlConnection(connectionString);
+        var query = "UPDATE LinkGroups SET Name=@name," +
+                    "Description=@desc, ShortName=@shortName, UserId=@userId," +
+                    "Clicked=@clicked, CategoryId=@catId " +
+                    "WHERE LinkGroupId=@linkGroupId";
+        var resultAffected = await connection.ExecuteAsync(query, new
+        {
+            name = entity.Name,
+            desc = entity.Description,
+            shortName = entity.ShortName,
+            linkGroupId = entity.LinkGroupId,
+            userId = entity.User.UserId,
+            clicked = entity.Clicked,
+            catId = entity.Category.CategoryId
+        });
+        
+        if (!entity.Links.Any()) return resultAffected > 0;
+        
+        query = "DELETE FROM Links WHERE LinkGroupId=@linkGroupId";
+        await connection.ExecuteAsync(query, new
+        {
+            linkGroupId = entity.LinkGroupId
+        });
+        await SaveLinksToDatabaseAsync(entity.LinkGroupId, entity.Links.ToArray());
+        return resultAffected > 0;
+    }
+
+    public async Task<LinkGroup> GetLinkFromShortNameAsync(string shortName)
+    {
+        await using var connection = new SqlConnection(connectionString);
+
+        var query = "SELECT G.LinkGroupId FROM LinkGroups G WHERE G.ShortName=@shortName";
+        var linkGroupId = await connection.QuerySingleAsync<string>(query, new { shortName });
+
+        var group = await DetailsAsync(linkGroupId);
+        group.Clicked += 1;
+
+        try
+        {
+            await UpdateAsync(group);
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.Message);
+            return null!;
+        }
+
+        return group;
+    }
+
+    public async Task<bool> AddLinksToLinkGroupAsync(string linkGroupId, List<Link> links)
+    {
+        try
+        {
+            await SaveLinksToDatabaseAsync(linkGroupId, links.ToArray());
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.Message);
+            return false;
+        }
+        return true;
     }
 
     public override async Task<List<LinkGroup>> GetAsync()

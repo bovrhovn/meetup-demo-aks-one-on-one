@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{linkGroupId?}"
 @model SimpleUrlList.Web.Pages.Groups.CreatePageModel
 
 @{
@@ -18,26 +18,57 @@
             class="breadcrumb-item active">
             Create
         </li>
+        <li class="breadcrumb-item">
+            Add links
+        </li>
     </ol>
 }
 
 <h3>Create link group</h3>
-<div class="mb-3">
-    <label asp-for="CreateLinkGroup.Name" class="form-label">Name</label>
-    <input asp-for="CreateLinkGroup.Name" class="form-control" required="required" id="tbName" type="text">
-</div>
-<div class="mb-3">
-    <label asp-for="CreateLinkGroup.ShortName" class="form-label">Shortname</label>
-    <input asp-for="CreateLinkGroup.ShortName" class="form-control" required="required" id="tbShortName" type="text">
-</div>
-<div class="mb-3">
-    <label asp-for="CreateLinkGroup.Description" class="form-label">Description</label>
-    <input asp-for="CreateLinkGroup.Description" class="form-control" id="tbDescription"
-           type="text">
-</div>
-<div class="mb-3">
-    <button class="btn btn-primary mr-3 mt-2">
-        Save <i class="fas fa-save"></i>
-    </button>
-    <a asp-page="/Groups/Index">Back to link groups</a>
-</div>
+
+<form enctype="multipart/form-data"
+      method="post">
+    <input type="hidden" asp-for="CreateLinkGroup.LinkGroupId">
+    <div class="mb-3">
+        <label asp-for="CreateLinkGroup.Name" class="form-label">Name</label>
+        <input asp-for="CreateLinkGroup.Name" class="form-control" required="required" id="tbName" type="text">
+    </div>
+    <div class="mb-3">
+        <label asp-for="CreateLinkGroup.ShortName" class="form-label">Shortname</label>
+        <input asp-for="CreateLinkGroup.ShortName" class="form-control" required="required" id="tbShortName" type="text">
+    </div>
+    <div class="mb-3">
+        <label asp-for="CreateLinkGroup.Description" class="form-label">Description</label>
+        <input asp-for="CreateLinkGroup.Description" class="form-control" id="tbDescription"
+               type="text">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Choose category</label>
+        <select asp-for="CreateLinkGroup.Category.CategoryId" class="form-control" name="ddlCategory">
+            @foreach (var category in Model.Categories)
+            {
+                if (string.IsNullOrEmpty(Model.CreateLinkGroup.LinkGroupId))
+                {
+                    <option value="@category.CategoryId">@category.Name</option>
+                }
+                else
+                {
+                    if (category.CategoryId == Model.CreateLinkGroup.Category.CategoryId)
+                    {
+                        <option value="@category.CategoryId" selected="selected">@category.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@category.CategoryId">@category.Name</option>
+                    }
+                }
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary mr-3 mt-2" type="submit">
+            Save <i class="fas fa-save"></i>
+        </button>
+        <a asp-page="/Groups/Index">Back to link groups</a>
+    </div>
+</form>
