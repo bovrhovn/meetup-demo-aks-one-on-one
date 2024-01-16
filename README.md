@@ -51,6 +51,7 @@ in [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/overview?v
 5. [Power tools for kubectl](https://github.com/ahmetb/kubectx)
 6. [Portainer](https://www.portainer.io/installation/)
 7. [Azure Kubernetes Service](https://docs.microsoft.com/en-us/azure/aks/)
+8. [AKS training](https://learn.microsoft.com/en-us/training/paths/intro-to-kubernetes-on-azure/)
 
 # CREDITS
 
