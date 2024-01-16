@@ -17,10 +17,13 @@ spec:
         "kubernetes.io/os": linux
       containers:
         - name: web
-          image: meetupsul.azurecr.io/web:latest
+          image: meetupsul.azurecr.io/web:novalidate
           env:
             - name: DataOptions__ConnectionString
-              value: ""
+              valueFrom:
+                secretKeyRef:
+                  name: database-configs
+                  key: SqlConnectionString
             - name: AppOptions__ClientApiUrl
               value: "http://ntk.svc.cluster.local/api/"
           resources:
@@ -33,6 +36,19 @@ spec:
           ports:
             - containerPort: 8080
               name: internet
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+      - name: secrets-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "azure-kvname"
+          nodePublishSecretRef: 
+            name: secrets-store-creds
 ---
 apiVersion: v1
 kind: Service

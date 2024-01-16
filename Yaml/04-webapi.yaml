@@ -20,7 +20,10 @@ spec:
           image: meetupsul.azurecr.io/api:novalidate
           env:
             - name: DataOptions__ConnectionString
-              value: ""
+              valueFrom:
+                secretKeyRef:
+                  name: database-configs
+                  key: SqlConnectionString
             - name: AuthOptions__BaseUrl
               value: "http://4.225.37.67/"
           resources:
@@ -31,7 +34,20 @@ spec:
               cpu: 250m
               memory: 256Mi
           ports:
-            - containerPort: 8080 
+            - containerPort: 8080
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+      - name: secrets-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "azure-kvname"
+          nodePublishSecretRef:
+            name: secrets-store-creds
 ---
 apiVersion: v1
 kind: Service
