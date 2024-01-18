@@ -1,0 +1,24 @@
+﻿apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: azure-tls
+  namespace: play
+spec:
+  provider: azure
+  secretObjects:                            
+    - secretName: ingress-tls-csi
+      type: kubernetes.io/tls
+      data:
+        - objectName: CERTSECRETNAME
+          key: tls.key
+        - objectName: CERTSECRETNAME
+          key: tls.crt
+  parameters:
+    usePodIdentity: "false"
+    keyvaultName: sul-kv                 
+    objects: |
+      array:
+        - |
+          objectName: MyCERTSECRETNAME
+          objectType: secret
+    tenantID: YOURTEANTID

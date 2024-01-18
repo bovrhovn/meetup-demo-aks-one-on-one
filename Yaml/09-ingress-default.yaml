@@ -1,0 +1,25 @@
+﻿apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: Title
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: busybox-one
+                port:
+                  number: 80
+          - path: two(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: busybox-two
+                port:
+                  number: 80         

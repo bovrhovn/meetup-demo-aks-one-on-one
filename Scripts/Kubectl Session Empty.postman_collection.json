@@ -1,0 +1,208 @@
+{
+	"info": {
+		"_postman_id": "b4b82708-dc30-4086-86d4-a1fb58a9b58c",
+		"name": "Kubectl Session Empty",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "498671"
+	},
+	"item": [
+		{
+			"name": "00-Cluster Ready",
+			"protocolProfileBehavior": {
+				"strictSSL": false
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://[your cluster API]/readyz?verbose&exclude=etcd'",
+					"protocol": "https",
+					"host": [
+						"[your cluster API]"
+					],
+					"path": [
+						"readyz"
+					],
+					"query": [
+						{
+							"key": "verbose",
+							"value": null
+						},
+						{
+							"key": "exclude",
+							"value": "etcd'"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "01-list api",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://[your cluster API]/api/v1/",
+					"protocol": "https",
+					"host": [
+						"[your cluster API]"
+					],
+					"path": [
+						"api",
+						"v1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "02-list namespaces",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://[your cluster API]/api/v1/namespaces/",
+					"protocol": "https",
+					"host": [
+						"[your cluster API]"
+					],
+					"path": [
+						"api",
+						"v1",
+						"namespaces",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "03-list pods",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json;as=Table;g=meta.k8s.io;v=v1, application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://[your cluster API]/api/v1/namespaces/kube-system/pods",
+					"protocol": "https",
+					"host": [
+						"[your cluster API]"
+					],
+					"path": [
+						"api",
+						"v1",
+						"namespaces",
+						"kube-system",
+						"pods"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "04-create pod",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"kind\": \"Pod\",\r\n    \"apiVersion\": \"v1\",\r\n    \"metadata\": {\r\n        \"name\": \"pod-test\",\r\n        \"labels\": {\r\n            \"run\": \"pod\"\r\n        }\r\n    },\r\n    \"spec\": {\r\n        \"containers\": [\r\n            {\r\n                \"name\": \"pod-test\",\r\n                \"image\": \"nginx:latest\",\r\n                \"resources\": {}\r\n            }\r\n        ],\r\n        \"restartPolicy\": \"Always\",\r\n        \"dnsPolicy\": \"ClusterFirst\"\r\n    },\r\n    \"status\": {}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://[your cluster API]/api/v1/namespaces/{{nsname}}/pods",
+					"protocol": "https",
+					"host": [
+						"[your cluster API]"
+					],
+					"path": [
+						"api",
+						"v1",
+						"namespaces",
+						"{{nsname}}",
+						"pods"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "05-get pod details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://[your cluster API]/api/v1/namespaces/{{nsname}}/pods/pod-test",
+					"protocol": "https",
+					"host": [
+						"[your cluster API]"
+					],
+					"path": [
+						"api",
+						"v1",
+						"namespaces",
+						"{{nsname}}",
+						"pods",
+						"pod-test"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "namespacename",
+			"value": "namespaces"
+		},
+		{
+			"key": "nsname",
+			"value": "default"
+		}
+	]
+}

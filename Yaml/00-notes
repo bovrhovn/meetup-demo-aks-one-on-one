@@ -1,0 +1,103 @@
+﻿//create a namespace to play in
+1. show cluster information and how to acces it via REST API
+kubectl cluster-info
+kubectl api-resources
+kubectl config view
+## bootstrap token -- service account with RBAC
+kubectl apply -f 00-service-account.yaml
+## get token from service account
+kubectl apply -f 00-service-account-token.yaml
+## get token from service account
+kubectl describe secret my-token
+-- QUERY health API endpoint (Postman)
+-- QUERY pods API endpoint and demonstrate permissions (Postman)
+kubectl create clusterrolebinding admin-binding --clusterrole=cluster-admin --serviceaccount=default:my-service-account
+
+kubectl get nodes
+kubectl get nodes -o wide
+kubectl get pods --all-namespaces
+kubectl top node
+kubectl top pod --all-namespaces
+kubectl top pod --all-namespaces --containers=true
+-- show grafana, show container insights
+
+2. Create and work with resources - kubectl create namespace play
+
+-- show solution in Rider and how it works
+kubectl run web --image=YOURREGSTRY.azurecr.io/web:novalidate --port=8080 -n play
+kubectl get pods -o='custom-columns=PODS:.metadata.name,Images:.spec.containers[*].image' -n play
+kubectl describe pod web -n play
+kubectl port-forward web 8083:8080 -n play
+kubectl exec web -n play -- ls 
+kubectl expose pod web --type=LoadBalancer --port=80 --target-port=80 -n play
+kubectl delete pod web -n play
+kubectl label svc web run=web -n play --overwrite
+kubectl delete pod <nameofpod> -n play
+
+3. do show example and show how it is done with yaml
+$SQL='Server=tcp:YOURDATABASE.database.windows.net,1433;Initial Catalog=SulDb;Persist Security Info=False;User ID=YOURUSER;Password=NOPE;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+kubectl run web --env="DataOptions__ConnectionString=$SQL" --env="AuthOptions__ConnectionString=ProdKey" --image=YOURREGSTRY.azurecr.io/web:novalidate --port=80 -n play
+kubectl exec web env
+
+--env="AuthOptions__BaseUrl="
+kubectl run api --env="DataOptions__ConnectionString=$SQL" --env="AuthOptions__ConnectionString=ProdKey" --image=YOURREGSTRY.azurecr.io/api:novalidate --port=80 -n play
+kubectl expose pod api --name=api --type=ClusterIP --port=80 --target-port=8080 -n play
+kubectl delete pod <nameofpod> -n play
+
+## integrating https://azure.github.io/secrets-store-csi-driver-provider-azure/docs/demos/standard-walkthrough/
+kubectl create secret generic secrets-store-creds --from-literal clientid=YOURAPPID --from-literal clientsecret=YOURAPPSECRET -n play
+kubectl label secret secrets-store-creds secrets-store.csi.k8s.io/used=true -n play
+kubectl apply -f 02-secrets-store.yaml
+kubectl apply -f 01-busybox-env.yaml
+kubectl exec busybox-secrets-store-inline -n play -- ls /mnt/secrets-store/ 
+kubectl exec busybox-secrets-store-inline -n play -- cat /mnt/secrets-store/SqlConnectionString
+
+//create deployments
+kubectl apply -f 02-web.yaml
+kubectl get svc -n play
+kubectl apply -f 04-webapi.yaml
+
+3. a ingress options
+
+// Ingress App gateway or Ingress via Nginx
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx/ingress-nginx --generate-name --namespace play --set controller.replicaCount=2 --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+kubectl apply -f https://raw.githubusercontent.com/Azure/secrets-store-csi-driver-provider-azure/master/docs/sample/ingress-controller-tls/deployment-app-one.yaml -n play
+kubectl apply -f https://raw.githubusercontent.com/Azure/secrets-store-csi-driver-provider-azure/master/docs/sample/ingress-controller-tls/deployment-app-two.yaml -n play
+kubectl apply -f https://raw.githubusercontent.com/Azure/secrets-store-csi-driver-provider-azure/master/docs/sample/ingress-controller-tls/ingress.yaml -n play
+kubectl get service -l app=nginx-ingress --namespace play
+
+4. Show random useful stuff
+
+-- POLICY
+kubectl run --rm -it --image=alpine network-policy -n ntk  
+wget http://web
+
+kubectl apply -f 06-network-policy.yaml
+kubectl run --rm -it --image=alpine network-policy -n ntk  
+wget --timeout=2 http://web
+
+-- TAINTING
+
+kubectl get nodes
+kubectl taint node NODENAME node-type=production:NoSchedule
+kubectl run test --image busybox -- sleep 99999
+kubectl get po -o wide
+kubectl taint node NODENAME node-type=production:NoSchedule-
+kubectl get pods -o wide
+
+-- HPA
+kubectl apply -f 08-php-apache.yaml
+kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=8
+kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-apache; done
+# type Ctrl+C to end the watch when you're ready
+kubectl get hpa php-apache --watch
+
+kubectl get deployment php-apache
+
+-- KUBECOST - an example of a helm chart with a lot of stuff
+ 
+helm upgrade --install kubecost --repo https://kubecost.github.io/cost-analyzer/ cost-analyzer --namespace kubecost --create-namespace
+kubectl port-forward --namespace kubecost deployment/kubecost-cost-analyzer 9090
+helm uninstall kubecost -n kubecost

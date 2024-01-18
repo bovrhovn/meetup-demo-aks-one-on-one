@@ -1,7 +1,9 @@
-# meetup demo: Azure Kubernetes Service 1 on 1
+# Meetup demo: Azure Kubernetes Service 1 on 1
 
 Demos for meetup about [Azure Kubernetes Service](https://learn.microsoft.com/en-us/azure/aks/intro-kubernetes) and how
 to operate the heavy machinery.
+
+![Kubernetes structure](https://webeudatastorage.blob.core.windows.net/web/k8s-structure.png)
 
 ## Prerequisites
 
@@ -42,10 +44,42 @@ in [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/overview?v
 
 ## Demo code structure
 
+The demo code is structured in the following way:
+
+![code structure](https://webeudatastorage.blob.core.windows.net/web/k8s-oneonone-code-structure.png)
+
+1. [SimpleUrlList.Web](./SimpleUrlListSLN/SimpleUrlList.Web) - the web application
+    - You will need to set settings in appsettings.json to work with SQL Server or Azure SQL
+    - You will need to set settings in appsettings.json to work with API link (
+      check [Links.cshtml](./SimpleUrlListSLN/SimpleUrlList.Web/Pages/Groups/Links.cshtml))
+2. [SimpleUrlList.SQL](./SimpleUrlListSLN/SimpleUrlList.SQL) - project to work with SQL Server
+3. [SimpleUrlList.Models](./SimpleUrlListSLN/SimpleUrlList.Models) - project with models, which are shared between web
+   and API
+4. [SimpleUrlList.Interfaces](./SimpleUrlListSLN/SimpleUrlList.Interfaces) - project with contracts and implementation
+   with SQL
+5. [SimpleUrlList.Api](./SimpleUrlListSLN/SimpleUrlList.Api) - API project to get link groups / links and enable you to
+   redirect apps
+
+[Docker files](./Docker) are available to build and run the application in containers. You can also leverage helper
+script [Compile-Containers.ps1](./Scripts/Compile-Containers.ps1) to
+build containers
+using [Azure Container Registry task builders](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-tutorial-build-task).
+
+## YAML files
+
+All the files we used on the session are available in [YAML folder](./Yaml). Step by step execution is in
+file [00-notes](./Yaml/00-notes).
+
+If you want to test REST api's, there
+is [Postman collection](./Scripts/Kubectl%20Session%20Empty.postman_collection.json) available. How to use it, you can
+read [here](https://learning.postman.com/docs/getting-started/importing-and-exporting/importing-and-exporting-overview/).
+
 # Additional information and links
 
-1. [Kubernetes Api Client Libraries](https://github.com/kubernetes-client) and [3rd party community-maintained client libraries](https://kubernetes.io/docs/reference/using-api/client-libraries/#community-maintained-client-libraries)
-2. [Kubernetes Api Overview](https://kubernetes.io/docs/reference/using-api/) and [controlling access to cluster](https://kubernetes.io/docs/concepts/security/controlling-access/)
+1. [Kubernetes Api Client Libraries](https://github.com/kubernetes-client)
+   and [3rd party community-maintained client libraries](https://kubernetes.io/docs/reference/using-api/client-libraries/#community-maintained-client-libraries)
+2. [Kubernetes Api Overview](https://kubernetes.io/docs/reference/using-api/)
+   and [controlling access to cluster](https://kubernetes.io/docs/concepts/security/controlling-access/)
 3. [Kubeconfig view](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/)
 4. [Setup kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 5. [Power tools for kubectl](https://github.com/ahmetb/kubectx)
@@ -56,6 +90,7 @@ in [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/overview?v
 # CREDITS
 
 In this demo, we used the following 3rd party libraries and solutions:
+
 1. [Spectre Console](https://github.com/spectresystems/spectre.console/)
 2. [C# managed library for Kubernetes](https://github.com/kubernetes-client/csharp)
 

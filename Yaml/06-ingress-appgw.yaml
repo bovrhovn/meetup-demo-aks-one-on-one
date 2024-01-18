@@ -1,0 +1,113 @@
+﻿apiVersion: v1
+kind: Pod
+metadata:
+  name: aspnetapp
+  namespace: ntk
+  labels:
+    app: aspnetapp
+spec:
+  containers:
+    - name: web
+      image: meetupsul.azurecr.io/web:novalidate
+      env:
+        - name: DataOptions__ConnectionString
+          value: ""
+        - name: AppOptions__ClientApiUrl
+          value: "http://ntk.svc.cluster.local/api/"
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
+      ports:
+        - containerPort: 8080
+          name: internet
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aspnetapp
+  namespace: ntk
+spec:
+  selector:
+    app: aspnetapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-api
+  namespace: ntk
+  labels:
+    app: my-api
+spec:
+  containers:
+    - name: api
+      image: meetupsul.azurecr.io/api:novalidate
+      env:
+        - name: DataOptions__ConnectionString
+          value: ""
+        - name: AppOptions__ClientApiUrl
+          value: "http://ntk.svc.cluster.local/api/"
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
+      ports:
+        - containerPort: 8080
+          name: internet
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-api
+  namespace: ntk
+spec:
+  selector:
+    app: my-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-app-ingress
+  namespace: ntk
+spec:
+  ingressClassName: azure-application-gateway
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              service:
+                name: aspnetapp
+                port:
+                  number: 80
+            pathType: Exact
+          - path: /api
+            backend:
+              service:
+                name: my-api
+                port:
+                  number: 80
+            pathType: Prefix
+          - path: /
+            backend:
+              service:
+                name: aspnetapp
+                port:
+                  number: 80
+            pathType: Prefix

@@ -1,0 +1,35 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-one
+  labels:
+    app: busybox-one
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox-one
+  template:
+    metadata:
+      labels:
+        app: busybox-one
+    spec:
+      containers:
+        - name: busybox
+          image: meetupsul.azurecr.io/web:novalidate
+          env:
+            - name: DataOptions__ConnectionString
+              value: ""
+            - name: AppOptions__ClientApiUrl
+              value: "http://ntk.svc.cluster.local/api/"  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: busybox-one
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+  selector:
+    app: busybox-one
